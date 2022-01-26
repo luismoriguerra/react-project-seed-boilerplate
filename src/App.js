@@ -1,25 +1,40 @@
-import logo from './logo.svg';
-import './App.css';
+//@ts-check
+import "./App.css";
+import { useAuth0, withAuthenticationRequired } from "@auth0/auth0-react";
+import Home from "./containers/Home";
+import Menu from "./components/menu";
+import { Route, Routes } from "react-router-dom";
 
-function App() {
+const HomePrivate = withAuthenticationRequired(Home);
+
+export default function App() {
+  const { isLoading, isAuthenticated, error, user, loginWithRedirect, logout } =
+    useAuth0();
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Menu />
+      <Routes>
+        <Route path="/" element={<HomePrivate />} />
+      </Routes>
     </div>
   );
 }
 
-export default App;
+function Login({ loginWithRedirect }) {
+  return <button onClick={loginWithRedirect}>Log in</button>;
+}
+
+function Logout(props) {
+  return (
+    <button
+      onClick={() =>
+        props.logout({
+          returnTo: window.location.origin,
+        })
+      }
+    >
+      Log out
+    </button>
+  );
+}
